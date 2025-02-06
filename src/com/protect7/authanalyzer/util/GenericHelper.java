@@ -24,10 +24,14 @@ import burp.IResponseInfo;
 public class GenericHelper {
 
 	public static void repeatRequests(IHttpRequestResponse[] messages, ConfigurationPanel configurationPanel) {
+		boolean wasPaused = false;
+		boolean wasStopped = false;
 		if(configurationPanel.isPaused()) {
+			wasPaused = true;
 			configurationPanel.pauseButtonPressed();
 		}
 		if(!CurrentConfig.getCurrentConfig().isRunning()) {
+			wasStopped = true;
 			configurationPanel.startStopButtonPressed();
 		}
 		if(CurrentConfig.getCurrentConfig().isRunning()) {
@@ -51,6 +55,22 @@ public class GenericHelper {
 				if(!isFiltered) {
 					CurrentConfig.getCurrentConfig().performAuthAnalyzerRequest(message);
 				}
+			}
+			// If the configuration was paused before, wait 500ms and pause it again
+			if(wasPaused) {
+				ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+				executor.schedule(() -> {
+					configurationPanel.pauseButtonPressed();
+					executor.shutdown();
+				}, 500, TimeUnit.MILLISECONDS);
+			}
+			// If the configuration was stopped before, wait 500ms and stop it again
+			if(wasStopped) {
+				ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+				executor.schedule(() -> {
+					configurationPanel.startStopButtonPressed();
+					executor.shutdown();
+				}, 500, TimeUnit.MILLISECONDS);
 			}
 		}
 	}
