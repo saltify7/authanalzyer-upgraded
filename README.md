@@ -1,7 +1,7 @@
 # Credits 
 
 This extension is an upgraded version of AuthAnalyzer with a few additional features.
-All credits go to the original authors, and the extension can be found at: https://github.com/PortSwigger/autorize
+All credits go to the original authors, and the extension can be found at: [https://github.com/PortSwigger/autorize](https://github.com/PortSwigger/auth-analyzer)
 
 # Description
 
