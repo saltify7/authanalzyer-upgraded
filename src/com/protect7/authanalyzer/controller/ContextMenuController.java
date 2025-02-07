@@ -1,10 +1,10 @@
 package com.protect7.authanalyzer.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
+import burp.BurpExtender;
 import com.protect7.authanalyzer.entities.Token;
 import com.protect7.authanalyzer.gui.dialog.RepeatRequestFilterDialog;
 import com.protect7.authanalyzer.gui.entity.SessionPanel;
@@ -44,6 +44,8 @@ public class ContextMenuController implements IContextMenuFactory {
 			authAnalyzerMenu.addSeparator();
 			// Set Token Auto Add Menu
 			addAutoSetTokenMenu(authAnalyzerMenu, invocation);
+			// Set Cookie Auto Add Menu
+			addAutoSetCookieMenu(authAnalyzerMenu, invocation);
 		}
 		if (selection != null && selection[0] != selection[1]) {
 			if (iContext == IContextMenuInvocation.CONTEXT_MESSAGE_EDITOR_REQUEST
@@ -113,6 +115,48 @@ public class ContextMenuController implements IContextMenuFactory {
 		JMenuItem repeatRequests = new JMenuItem("Repeat Requests with Filter Options");
 		repeatRequests.addActionListener(e1 -> new RepeatRequestFilterDialog(authAnalyzerMenu, configurationPanel, invocation.getSelectedMessages()));
 		authAnalyzerMenu.add(repeatRequests);
+	}
+
+	private static Map<String, String> parseHeaders(String headers) {
+		Map<String, String> headerMap = new HashMap<>();
+		String[] lines = headers.split("\n");
+		for (String line : lines) {
+			String[] parts = line.split(": ", 2);
+			if (parts.length == 2) {
+				headerMap.put(parts[0], parts[1]);
+			}
+		}
+		return headerMap;
+	}
+
+	private void addAutoSetCookieMenu(JMenu analyzerMenu, IContextMenuInvocation invocation){
+		JMenu autoSetCookie = new JMenu("Set Headers Automatically");
+		for (String sessionName : configurationPanel.getSessionNames()) {
+			JMenuItem sessionItem = new JMenuItem("Session: " + sessionName);
+			sessionItem.addActionListener(e -> {
+				// get headers from last proxy request
+				ArrayList<String> headersList = ExtractionHelper.extractHeadersFromMessages(invocation.getSelectedMessages());
+				// cast headers to string separated by newline
+				String headers = String.join("\n", headersList);
+				// get headers from config
+				String currentHeaders = configurationPanel.getSessionPanelByName(sessionName).getHeadersToReplaceText();
+				// parse header lines into header object
+				Map<String, String> headerMap = parseHeaders(headers);
+				Map<String, String> currentHeaderMap = parseHeaders(currentHeaders);
+				String matchingHeadersString = "";
+
+				for (String key : headerMap.keySet()) {
+					if (currentHeaderMap.containsKey(key)) {
+						matchingHeadersString += key + ": " + headerMap.get(key) + "\n";
+					}
+				}
+
+				configurationPanel.getSessionPanelByName(sessionName).setHeadersToReplaceText(matchingHeadersString);
+				GenericHelper.animateBurpExtensionTab();
+			});
+			autoSetCookie.add(sessionItem);
+			analyzerMenu.add(autoSetCookie);
+		}
 	}
 	
 	private void addAutoSetTokenMenu(JMenu authAnalyzerMenu, IContextMenuInvocation invocation) {

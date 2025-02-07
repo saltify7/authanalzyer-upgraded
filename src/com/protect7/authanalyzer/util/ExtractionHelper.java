@@ -10,6 +10,8 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
+import burp.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,12 +25,6 @@ import com.protect7.authanalyzer.entities.FromToExtractLocation;
 import com.protect7.authanalyzer.entities.Token;
 import com.protect7.authanalyzer.entities.TokenBuilder;
 import com.protect7.authanalyzer.entities.TokenLocation;
-import burp.BurpExtender;
-import burp.ICookie;
-import burp.IHttpRequestResponse;
-import burp.IParameter;
-import burp.IRequestInfo;
-import burp.IResponseInfo;
 
 public class ExtractionHelper {
 
@@ -175,6 +171,17 @@ public class ExtractionHelper {
 			BurpExtender.callbacks.printError("Can not parse JSON Response. Error Message: " + e.getMessage());
 		}
 		return null;
+	}
+
+	public static ArrayList<String> extractHeadersFromMessages(IHttpRequestResponse[] messages) {
+		ArrayList<String> headers = new ArrayList<>();
+		for(IHttpRequestResponse message : messages) {
+			if(message.getRequest() != null) {
+				IRequestInfo requestInfo = BurpExtender.callbacks.getHelpers().analyzeRequest(message.getRequest());
+				headers.addAll(requestInfo.getHeaders());
+			}
+		}
+		return headers;
 	}
 	
 	public static ArrayList<Token> extractTokensFromMessages(IHttpRequestResponse[] messages) {
