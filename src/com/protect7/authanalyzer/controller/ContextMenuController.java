@@ -151,6 +151,11 @@ public class ContextMenuController implements IContextMenuFactory {
 					}
 				}
 
+				// remove last newline
+				if (matchingHeadersString.length() > 0) {
+					matchingHeadersString = matchingHeadersString.substring(0, matchingHeadersString.length() - 1);
+				}
+
 				configurationPanel.getSessionPanelByName(sessionName).setHeadersToReplaceText(matchingHeadersString);
 				GenericHelper.animateBurpExtensionTab();
 			});
