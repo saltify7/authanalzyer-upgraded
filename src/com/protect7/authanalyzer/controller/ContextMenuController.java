@@ -44,8 +44,11 @@ public class ContextMenuController implements IContextMenuFactory {
 			authAnalyzerMenu.addSeparator();
 			// Set Token Auto Add Menu
 			addAutoSetTokenMenu(authAnalyzerMenu, invocation);
+			authAnalyzerMenu.addSeparator();
 			// Set Cookie Auto Add Menu
 			addAutoSetCookieMenu(authAnalyzerMenu, invocation);
+			// Set Headers Auto Replace Menu
+			addAutoReplaceHeadersMenu(authAnalyzerMenu, invocation);
 		}
 		if (selection != null && selection[0] != selection[1]) {
 			if (iContext == IContextMenuInvocation.CONTEXT_MESSAGE_EDITOR_REQUEST
@@ -130,7 +133,7 @@ public class ContextMenuController implements IContextMenuFactory {
 	}
 
 	private void addAutoSetCookieMenu(JMenu analyzerMenu, IContextMenuInvocation invocation){
-		JMenu autoSetCookie = new JMenu("Set Headers Automatically");
+		JMenu autoSetCookie = new JMenu("Update matching headers in session");
 		for (String sessionName : configurationPanel.getSessionNames()) {
 			JMenuItem sessionItem = new JMenuItem("Session: " + sessionName);
 			sessionItem.addActionListener(e -> {
@@ -161,6 +164,48 @@ public class ContextMenuController implements IContextMenuFactory {
 			});
 			autoSetCookie.add(sessionItem);
 			analyzerMenu.add(autoSetCookie);
+		}
+	}
+
+	// set headers from authanalyzer config to current request
+	private void addAutoReplaceHeadersMenu(JMenu authAnalyzerMenu, IContextMenuInvocation invocation) {
+		JMenu autoReplaceHeaders = new JMenu("Replace matching headers from session");
+		for (String sessionName : configurationPanel.getSessionNames()) {
+			JMenuItem sessionItem = new JMenuItem("Session: " + sessionName);
+			sessionItem.addActionListener(e -> {
+				// get headers from invocation
+				ArrayList<String> invocationHeadersList = ExtractionHelper.extractHeadersFromMessages(invocation.getSelectedMessages());
+				// cast headers to string separated by newline
+				String invocationHeaders = String.join("\n", invocationHeadersList);
+				// get headers from config
+				String currentHeaders = configurationPanel.getSessionPanelByName(sessionName).getHeadersToReplaceText();
+				// parse header lines into header object
+				Map<String, String> invocationHeadersMap = parseHeaders(invocationHeaders);
+				Map<String, String> currentHeaderMap = parseHeaders(currentHeaders);
+				Map<String, String> matchingHeadersMap = new HashMap<>();
+
+				// add headers that are in both current and invocation to matchingHeadersMap
+				for (String key : invocationHeadersMap.keySet()) {
+					if (currentHeaderMap.containsKey(key)) {
+						matchingHeadersMap.put(key, currentHeaderMap.get(key));
+					}
+				}
+
+				// get request from invocation
+				IHttpRequestResponse message = invocation.getSelectedMessages()[0];
+				byte[] request = message.getRequest();
+				String requestString = new String(request);
+				String[] requestParts = requestString.split("\r\n\r\n", 2);
+
+				// replace matching headers in request
+				for (String key : matchingHeadersMap.keySet()) {
+					requestParts[0] = requestParts[0].replaceAll(key + ":.*", key + ": " + matchingHeadersMap.get(key));
+				}
+				String newRequest = requestParts[0] + "\r\n\r\n" + requestParts[1];
+				message.setRequest(newRequest.getBytes());
+			});
+			autoReplaceHeaders.add(sessionItem);
+			authAnalyzerMenu.add(autoReplaceHeaders);
 		}
 	}
 	
