@@ -16,7 +16,7 @@ This upgraded extensions contains the following functionalities:
 
 ## Bug fixes
 
-- Fixed a bug where the config wouldn't update if paused or stopped
+- Fixed a bug where the config wouldn't update if paused or running
 
 
 ## TODO
