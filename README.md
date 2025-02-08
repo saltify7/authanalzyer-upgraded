@@ -9,10 +9,9 @@ All credits go to the original authors, and the extension can be found at: https
 
 This upgraded extensions contains the following functionalities:
 - Re-pause or re-stop the extension after repeating a request from a different tab
-- Added functionality to automatically update request headers from an existing request
-- Added functionality to automatically update matching headers in Repeater from AuthAnalyzer sessions
+- Added button to automatically update matching Headers in AuthAnalyzer sessions from an existing request
+- Added button to automatically update matching Headers in Repeater/Intruder from AuthAnalyzer sessions
 
 ## TODO
 
-- Add a button to automatically update headers from the most recent Proxy request to the AuthAnalyzer menu
 - Add custom hotkeys to the extension
