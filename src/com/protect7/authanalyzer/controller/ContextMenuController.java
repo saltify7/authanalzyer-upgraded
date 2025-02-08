@@ -10,6 +10,7 @@ import com.protect7.authanalyzer.gui.dialog.RepeatRequestFilterDialog;
 import com.protect7.authanalyzer.gui.entity.SessionPanel;
 import com.protect7.authanalyzer.gui.entity.TokenPanel;
 import com.protect7.authanalyzer.gui.main.ConfigurationPanel;
+import com.protect7.authanalyzer.util.CurrentConfig;
 import com.protect7.authanalyzer.util.ExtractionHelper;
 import com.protect7.authanalyzer.util.GenericHelper;
 import com.protect7.authanalyzer.util.Globals;
@@ -137,6 +138,17 @@ public class ContextMenuController implements IContextMenuFactory {
 		for (String sessionName : configurationPanel.getSessionNames()) {
 			JMenuItem sessionItem = new JMenuItem("Session: " + sessionName);
 			sessionItem.addActionListener(e -> {
+
+				// stop session if running or paused
+				boolean wasPaused = configurationPanel.isPaused();
+				boolean wasRunning = CurrentConfig.getCurrentConfig().isRunning();
+				if (wasPaused) {
+					configurationPanel.pauseButtonPressed();
+				}
+				if (wasRunning) {
+					configurationPanel.startStopButtonPressed();
+				}
+
 				// get headers from last proxy request
 				ArrayList<String> headersList = ExtractionHelper.extractHeadersFromMessages(invocation.getSelectedMessages());
 				// cast headers to string separated by newline
@@ -160,6 +172,15 @@ public class ContextMenuController implements IContextMenuFactory {
 				}
 
 				configurationPanel.getSessionPanelByName(sessionName).setHeadersToReplaceText(matchingHeadersString);
+
+				// restart session if it was running or paused
+				if (wasPaused) {
+					configurationPanel.pauseButtonPressed();
+				}
+				if (wasRunning) {
+					configurationPanel.startStopButtonPressed();
+				}
+
 				GenericHelper.animateBurpExtensionTab();
 			});
 			autoSetCookie.add(sessionItem);
