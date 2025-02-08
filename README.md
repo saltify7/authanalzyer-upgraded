@@ -14,6 +14,10 @@ This upgraded extensions contains the following functionalities:
 
 ![image](https://github.com/user-attachments/assets/d0e71fe9-71fa-4074-9c79-115c5e01dfc6)
 
+## Bug fixes
+
+- Fixed a bug where the config wouldn't update if paused or stopped
+
 
 ## TODO
 
