@@ -56,21 +56,21 @@ public class GenericHelper {
 					CurrentConfig.getCurrentConfig().performAuthAnalyzerRequest(message);
 				}
 			}
-			// If the configuration was paused before, wait 500ms and pause it again
+			// If the configuration was paused before, wait 1500ms and pause it again
 			if(wasPaused) {
 				ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 				executor.schedule(() -> {
 					configurationPanel.pauseButtonPressed();
 					executor.shutdown();
-				}, 500, TimeUnit.MILLISECONDS);
+				}, 1500, TimeUnit.MILLISECONDS);
 			}
-			// If the configuration was stopped before, wait 500ms and stop it again
+			// If the configuration was stopped before, wait 1500ms and stop it again
 			if(wasStopped) {
 				ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 				executor.schedule(() -> {
 					configurationPanel.startStopButtonPressed();
 					executor.shutdown();
-				}, 500, TimeUnit.MILLISECONDS);
+				}, 1500, TimeUnit.MILLISECONDS);
 			}
 		}
 	}

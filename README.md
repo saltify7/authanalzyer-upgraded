@@ -17,6 +17,7 @@ This upgraded extensions contains the following functionalities:
 ## Bug fixes
 
 - Fixed a bug where the config wouldn't update if paused or stopped
+- Additional bug fix - config wouldn't update until restarted when paused (also increased repeating delay to 1500ms)
 
 
 ## TODO

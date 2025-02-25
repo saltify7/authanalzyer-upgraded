@@ -143,7 +143,7 @@ public class ContextMenuController implements IContextMenuFactory {
 				boolean wasPaused = configurationPanel.isPaused();
 				boolean wasRunning = CurrentConfig.getCurrentConfig().isRunning();
 				if (wasPaused) {
-					configurationPanel.pauseButtonPressed();
+					configurationPanel.startStopButtonPressed();
 				}
 				if (wasRunning) {
 					configurationPanel.startStopButtonPressed();
@@ -175,6 +175,7 @@ public class ContextMenuController implements IContextMenuFactory {
 
 				// restart session if it was running or paused
 				if (wasPaused) {
+					configurationPanel.startStopButtonPressed();
 					configurationPanel.pauseButtonPressed();
 				}
 				if (wasRunning) {
