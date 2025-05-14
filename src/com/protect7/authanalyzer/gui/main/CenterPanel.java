@@ -305,10 +305,29 @@ public class CenterPanel extends JPanel {
 		}
 	}
 
+	public String prettifyJson(String text) {
+		String[] parts = text.split("\r\n\r\n", 2); // Split headers and body
+		if (parts.length == 2) {
+				String headers = parts[0];
+				String body = parts[1];
+				if (headers.toLowerCase().contains("content-type: application/json")) {
+						try {
+								Object json = new com.fasterxml.jackson.databind.ObjectMapper().readValue(body, Object.class);
+								return headers + "\r\n\r\n" + new com.fasterxml.jackson.databind.ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(json);
+						} catch (Exception e) {
+								// If parsing fails, return the original text
+								return text;
+						}
+				}
+		}
+		return text;
+	}
+
 	public void updateDiffPane() {
 		if (changeMessageViewButton.getText().equals(BUTTON_TEXT_SINGLE_VIEW) && showDiffCheckBox.isSelected()) {
-			String msg1 = tabbedPanel1.getCurrentMessageString();
-			String msg2 = tabbedPanel2.getCurrentMessageString();
+			String msg1 = prettifyJson(tabbedPanel1.getCurrentMessageString());
+			String msg2 = prettifyJson(tabbedPanel2.getCurrentMessageString());
+
 			if (msg1 == null || msg2 == null) {
 				diffPane.setText(TEXT_DIFF_VIEW_DEFAULT);
 			} else {
