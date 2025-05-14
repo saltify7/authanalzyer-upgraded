@@ -23,3 +23,6 @@ This upgraded extensions contains the following functionalities:
 ## TODO
 
 - Add custom hotkeys to the extension
+- Add beautified JSON diff
+  - (maybe) Set "show diff" button to remember if diff was expanded
+- Sync scrolling
